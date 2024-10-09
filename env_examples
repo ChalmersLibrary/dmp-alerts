@@ -1,0 +1,11 @@
+DMP_API_ENDPOINT=https://path-to-dmp-api:port/search?q=
+DMP_API_AUTH_KEY=
+SMTP_SERVER=my.smtp.com
+SMTP_PORT=587
+SMTP_UID=my-uid@example.com
+SMTP_PW=smtp-password
+NEW_DMP_RECIPIENT=new-dmp@example.com
+PERSONAL_DATA_RECIPIENT=pers-data@example.com
+LASTRUN_FILE=lastrun.txt
+LOG_RUNS_FILE=log_runs.txt
+LOGFILE=log.txt
