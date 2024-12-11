@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 import csv
 
-# Script for monitoring new and updated DMPs and creating alerts for relevant parties.
+# Script for monitoring new and updated DMPs and creating alerts for relevant stakeholders.
 # urban.andersson@chalmers.se
 
 # Configuration
@@ -50,6 +50,7 @@ if data:
     for i in data['items']:
         send_new_alert = 1
         send_pers_alert = 1
+        send_ethical_alert = 1
         print('title:' + str(i['dmp']['title']))
         dsw_title = i['dmp']['title']
         dsw_id = i['dmp']['dmp_id']['identifier']
@@ -93,13 +94,16 @@ if data:
         if 'title' not in i['dmp']:
             send_new_alert = 0
             send_pers_alert = 0
+            send_ethical_alert = 0
         if 'project' not in i['dmp']:
             send_new_alert = 0
             send_pers_alert = 0
+            send_ethical_alert = 0
         if 'project' in i['dmp'] and len(i['dmp']['project']) > 0:
             if 'title' not in i['dmp']['project'][0]:
                 send_new_alert = 0
                 send_pers_alert = 0
+                send_ethical_alert = 0
 
         # Send new dmp alert
         if send_new_alert == 1:
@@ -166,6 +170,47 @@ if data:
                     print('email could not be sent: %s' % e)
                     with open(os.getenv("LOGFILE"), 'a') as lf:
                         lf.write('Personal data alert could not be sent: %s' % e + '\n')
+
+        # Check if project need to apply for ethical review (or need support) and alert if so
+        ethical_review_needed = 'no'
+        if 'ethical_review_needed' in i['metadata']:
+            if i['metadata']['ethical_review_needed'] == 'yes':
+                ethical_review_needed = 'yes'
+
+        if ethical_review_needed == 'yes':
+
+            if send_ethical_alert == 1:
+                # Send new dmp alert
+                msg = EmailMessage()
+                message = '<p>Hej!</p><p>En ny datahanteringsplan för ett projekt som har ansökt om etikprövning och/eller ' \
+                          'behöver support kring detta har skapats eller uppdaterats av ' + dsw_creator + ': <br /><a ' \
+                                                                                                    'href="' + dsw_id \
+                          + '">' + dsw_id + '</a></p><p>Skapad: ' + dsw_created_date + '<br/>Senast uppdaterad: ' + dsw_modified_date + '</p><p> Följ länken för att se datahanteringsplanen.</p><p>Med ' \
+                                            'vänliga hälsningar,<br />Chalmers datakontor (CDO)<br ' \
+                                            '/>dataoffice@chalmers.se</p>'
+                msg['From'] = formataddr(('Chalmers DS Wizard', 'dsw-noreply@dsw.chalmers.se'))
+                msg['To'] = formataddr(('Chalmers dataskyddsombud', os.getenv("ETHICAL_REVIEW_RECIPIENT")))
+                msg['Cc'] = formataddr(('cc', os.getenv("BCC_RECIPIENT")))
+                msg['Subject'] = '[Chalmers DSW] Ny datahanteringsplan, projekt med behov av etikprövning'
+                msg.set_content(message, subtype='html')
+
+                # send the e-mail
+                try:
+                    server = smtplib.SMTP(os.getenv("SMTP_SERVER"), os.getenv("SMTP_PORT"))
+                    server.ehlo()
+                    server.starttls()
+                    server.login(os.getenv("SMTP_UID"), os.getenv("SMTP_PW"))
+                    server.send_message(msg)
+                    print('personal data alert email was sent to ' + os.getenv("ETHICAL_REVIEW_RECIPIENT"))
+                    with open(os.getenv("LOG_RUNS_FILE"), 'a') as lr:
+                        lr.write('ETHICAL_REVIEW_ALERT\t' + dsw_id + '\t' + current_date + '\t' + os.getenv("ETHICAL_REVIEW_RECIPIENT") + '\n')
+                    server.quit()
+                except:
+                    e = sys.exc_info()[0]
+                    print('email could not be sent: %s' % e)
+                    with open(os.getenv("LOGFILE"), 'a') as lf:
+                        lf.write('Ethical review alert could not be sent: %s' % e + '\n')
+
 
     # Update lastrun.txt with new timestamp
     with open(os.getenv("LASTRUN_FILE"), 'w') as out:

@@ -6,6 +6,7 @@ SMTP_UID=my-uid@example.com
 SMTP_PW=smtp-password
 NEW_DMP_RECIPIENT=new-dmp@example.com
 PERSONAL_DATA_RECIPIENT=pers-data@example.com
+ETHICAL_REVIEW_RECIPIENT=ethical@example.com
 LASTRUN_FILE=lastrun.txt
 LOG_RUNS_FILE=log_runs.txt
 LOGFILE=log.txt
