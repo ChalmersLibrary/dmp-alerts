@@ -29,9 +29,6 @@ with open(os.getenv("LASTRUN_FILE"), 'r') as file:
 # Debug, test
 # lastrun_date = '2021-09-01T00:00:00'
 
-with open(os.getenv("LOGFILE"), 'a') as lf:
-                    lf.write('Looking for new DMPs since ' + lastrun_date + '\n')
-
 # API queries (Lucene syntax)
 all_dmps_created_since_date_q = 'dmp.created:[' + lastrun_date + ' TO *] OR dmp.modified:[' + lastrun_date + ' TO *]'
 
