@@ -30,7 +30,7 @@ with open(os.getenv("LASTRUN_FILE"), 'r') as file:
 # lastrun_date = '2021-09-01T00:00:00'
 
 # API queries (Lucene syntax)
-all_dmps_created_since_date_q = 'dmp.created:[' + lastrun_date + ' TO *]+OR+dmp.modified:[' + lastrun_date + ' TO *]'
+all_dmps_created_since_date_q = 'dmp.created:[' + lastrun_date + ' TO *] OR dmp.modified:[' + lastrun_date + ' TO *]'
 
 # Request data from DMP API as string
 api_auth = 'Bearer ' + str(os.getenv("DMP_API_AUTH_KEY"))
