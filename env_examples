@@ -1,4 +1,5 @@
 DMP_API_ENDPOINT=https://path-to-dmp-api:port/search?q=
+DMP_API_ENDPOINT=https://path-to-dmp-api/dmps
 DMP_API_AUTH_KEY=
 SMTP_SERVER=my.smtp.com
 SMTP_PORT=587

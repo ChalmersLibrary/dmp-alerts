@@ -35,11 +35,13 @@ all_dmps_created_since_date_q = 'dmp.created:[' + lastrun_date + ' TO *]+OR+dmp.
 # Request data from DMP API as string
 api_auth = 'Bearer ' + str(os.getenv("DMP_API_AUTH_KEY"))
 headers = {'Accept': 'application/json',
+           'User-Agent': 'Chalmers DSW Alert Script',
            'Authorization': api_auth,
            'include-metadata': 'True'}
 
 # DO NOT use verify=False in production!!
-dsw_getallnewurl = os.getenv("DMP_API_ENDPOINT") + all_dmps_created_since_date_q
+dsw_getallnewurl = os.getenv("DMP_API_ENDPOINT") + '?query=' + all_dmps_created_since_date_q
+
 data = requests.get(url=dsw_getallnewurl, headers=headers, verify=True).text
 
 # convert string to Json
@@ -72,11 +74,6 @@ if data:
                 dsw_creator = '(okänd)'
         else:
             dsw_creator = '(okänd)'
-
-        # if 'contact' in i['dmp']:
-        #    dsw_creator = i['dmp']['contact']['name']
-        # else:
-        #    dsw_creator = '(okänd)'
 
         # Check if alert has already been sent
         with open(os.getenv("LOG_RUNS_FILE"), mode='r', ) as infile:
